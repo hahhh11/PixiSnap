@@ -1,0 +1,15 @@
+{
+	"dependencies": {
+		"gsap": "^3.12.7",
+		"pixi.js": "^8.9.1"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-legacy": "^6.0.2",
+		"vite": "^6.2.3"
+	},
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	}
+}
