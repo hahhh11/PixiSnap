@@ -1,0 +1,14 @@
+{
+	"bundles": [
+		{
+			"name": "common",
+			"resources": [
+				{
+					"id": "bg",
+					"src": "./assets/common/bg.png",
+					"type": "image"
+				}
+			]
+		}
+	]
+}

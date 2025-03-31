@@ -7,10 +7,14 @@
 		"@studiokloek/pixi-texturepacker": "^0.8.7",
 		"@tauri-apps/cli": "^2.4.0",
 		"@vitejs/plugin-legacy": "^6.0.2",
+		"chokidar": "^4.0.3",
+		"fs-extra": "^11.3.0",
+		"path": "^0.12.7",
 		"vite": "^6.2.3"
 	},
+	"type": "module",
 	"scripts": {
-		"dev": "vite",
+		"dev": "NODE_ENV=development node scripts/generate-manifest.mjs & vite",
 		"build": "vite build",
 		"preview": "vite preview"
 	}
