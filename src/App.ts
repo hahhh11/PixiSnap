@@ -3,6 +3,7 @@ import { gameLayers } from "./core/views/layers";
 import { changeScene } from "./core/ctrls";
 import { StartScene } from "./scenes/StartScene";
 import manifest from "./assets/manifest";
+import { LoadingScene } from "./scenes/LoadingScene";
 export { gsap } from "gsap";
 
 interface AppOptions extends ApplicationOptions {
@@ -72,7 +73,7 @@ export class App extends Application {
 		// 预加载
 		await Preload();
 
-		changeScene(StartScene, {});
+		changeScene(LoadingScene, {});
 	}
 
 	private setupAdaptation() {

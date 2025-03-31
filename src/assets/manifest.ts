@@ -10,6 +10,16 @@
         type: "image"
       }
     ]
+  },
+  {
+    name: "loadingScene",
+    assets: [
+      {
+        alias: "loading_fill",
+        src: "./assets/loadingScene/loading_fill.png",
+        type: "image"
+      }
+    ]
   }
 ]
                 };

@@ -20,7 +20,7 @@ export type ImageProgressBarOptions = {
 
 export class ImageProgressBar extends Container {
 	private bg: Sprite;
-	private fill: TilingSprite;
+	private fill: Sprite;
 	private fillMask: Graphics;
 	private currentProgress = 0;
 	private tween?: gsap.core.Tween;
@@ -57,14 +57,17 @@ export class ImageProgressBar extends Container {
 		return bg;
 	}
 
-	private createFill(): TilingSprite {
-		const texture = this.resolveTexture(this.options.fillTexture);
-		const fill = new TilingSprite({ texture, width: texture.width, height: texture.height });
+	private createFill(): Sprite {
+		const texture = typeof this.options.fillTexture === "string" ? Texture.from(this.options.fillTexture) : this.options.fillTexture;
 
-		// 设置平铺模式
-		fill.texture.source.addressMode = this.options.tileMode === "repeat" ? "repeat" : "clamp-to-edge";
+		// 关键设置：禁用纹理重复，启用线性拉伸
+		texture.source.scaleMode = "linear"; // 保持拉伸平滑
+		texture.source.wrapMode = "clamp-to-edge";
 
-		return fill;
+		const sprite = new Sprite(texture);
+		sprite.width = this.options.direction === "horizontal" ? this.options.width : texture.orig.width;
+		sprite.height = this.options.direction === "vertical" ? this.options.height : texture.orig.height;
+		return sprite;
 	}
 
 	private createMask(): Graphics {
