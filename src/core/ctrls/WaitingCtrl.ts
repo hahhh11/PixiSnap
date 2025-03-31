@@ -1,6 +1,6 @@
-import { Waiting } from '../views/Waiting';
-import { gameLayers } from '../views/layers';
-import { Application, Container, Graphics, Text, TextStyle, Ticker } from 'pixi.js';
+import { Waiting } from "../views/Waiting";
+import { gameLayers } from "../views/layers";
+import { Application, Container, Graphics, Text, TextStyle, Ticker } from "pixi.js";
 
 export class WaitingCtrl {
 	private waiting?: Waiting;
@@ -15,14 +15,14 @@ export class WaitingCtrl {
 		this._parent = parent;
 		this.waiting = new Waiting({
 			// 可以在这里传入自定义配置
-			backgroundColor: 0x333333,
-			backgroundAlpha: 0.8,
+			backgroundColor: 0x000000,
+			backgroundAlpha: 0.5,
 		});
 	}
 
 	showWaiting(message) {
 		if (!this.waiting) {
-			console.warn('WaitingCtrl not initialized. Call init() first.');
+			console.warn("WaitingCtrl not initialized. Call init() first.");
 			return;
 		}
 		this._parent?.addChild(this.waiting);

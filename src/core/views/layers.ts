@@ -1,8 +1,8 @@
-import { Application, Container } from 'pixi.js';
-import SceneCtrl from '../ctrls/SceneCtrl';
-import ModalCtrl from '../ctrls/ModalCtrl';
-import { WaitingCtrl } from '../ctrls';
-import { ToastCtrl } from '../ctrls/ToastCtrl';
+import { Application, Container } from "pixi.js";
+import SceneCtrl from "../ctrls/SceneCtrl";
+import ModalCtrl from "../ctrls/ModalCtrl";
+import { WaitingCtrl } from "../ctrls";
+import { ToastCtrl } from "../ctrls/ToastCtrl";
 
 class Layers extends Container {
 	private _bottomLayer: Container;
@@ -21,7 +21,7 @@ class Layers extends Container {
 		this.canvas = app.canvas;
 		this.renderer = app.renderer;
 		this.stage.addChild(this);
-		var arr = ['_bottomLayer', '_sceneLayer', '_popupLayer', '_toastLayer', '_topLayer', '_shareLayer'];
+		var arr = ["_bottomLayer", "_sceneLayer", "_popupLayer", "_toastLayer", "_topLayer", "_shareLayer"];
 		for (var i = 0; i < arr.length; i++) {
 			this[arr[i]] = new Container();
 			//有些时候，定宽的时候，部分layer置顶，部分居中，再处理

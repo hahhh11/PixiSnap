@@ -1,5 +1,6 @@
-import { Application, Container, Graphics, Text, TextStyle, Ticker } from 'pixi.js';
-import { gameLayers } from './layers';
+import { Application, Container, Graphics, Text, TextStyle, Ticker } from "pixi.js";
+import { gameLayers } from "./layers";
+import { App } from "../../App";
 interface WaitingOptions {
 	/** 背景颜色（默认半透明黑色） */
 	backgroundColor?: number;
@@ -20,6 +21,7 @@ interface WaitingOptions {
 }
 
 export class Waiting extends Container {
+	private bg: Graphics;
 	private spinner: Graphics;
 	private text: Text;
 	private options: Required<WaitingOptions>;
@@ -29,15 +31,15 @@ export class Waiting extends Container {
 		super();
 		// 合并默认选项
 		this.options = {
-			backgroundColor: 0x000000,
-			backgroundAlpha: 0.7,
+			backgroundColor: 0xff0000,
+			backgroundAlpha: 0,
 			spinnerColor: 0xffffff,
 			textStyle: new TextStyle({
 				fill: 0xffffff,
 				fontSize: 20,
-				fontFamily: 'Arial',
+				fontFamily: "Arial",
 			}),
-			defaultText: 'Loading...',
+			defaultText: "Loading...",
 			rotationSpeed: 0.1,
 			spinnerRadius: 30,
 			spinnerLineWidth: 4,
@@ -49,22 +51,22 @@ export class Waiting extends Container {
 		this.zIndex = 9999; // 确保在最上层
 
 		// 创建背景
-		const bg = new Graphics();
-		bg.fill({ color: this.options.backgroundColor, alpha: this.options.backgroundAlpha });
+		const bg = (this.bg = new Graphics());
 		bg.rect(0, 0, 100, 100); // 初始尺寸会被调整
+		bg.fill({ color: this.options.backgroundColor, alpha: this.options.backgroundAlpha });
 		this.addChild(bg);
 
 		// 创建旋转指示器
 		this.spinner = new Graphics();
-		this.spinner.fill({ color: this.options.spinnerColor });
 		this.spinner.setStrokeStyle(this.options.spinnerLineWidth);
 		this.spinner.arc(0, 0, this.options.spinnerRadius, 0, Math.PI * 1.5);
+		this.spinner.fill({ color: this.options.spinnerColor });
 		this.spinner.position.set(0, 0);
 		this.addChild(this.spinner);
 
 		// 创建文本
 		this.text = new Text({ text: this.options.defaultText, style: this.options.textStyle });
-		this.text.anchor.set(0.5);
+		this.text.anchor.set(0);
 		this.text.position.set(0, this.options.spinnerRadius + 40);
 		this.addChild(this.text);
 
@@ -103,17 +105,19 @@ export class Waiting extends Container {
 	 * 更新尺寸以适应屏幕
 	 */
 	private updateSize(): void {
-		const bg = this.children[0] as Graphics;
+		const bg = this.bg;
 		bg.clear();
+		bg.rect(0, 0, App._instance.designWidth, App._instance.designHeight);
 		bg.fill({ color: this.options.backgroundColor, alpha: this.options.backgroundAlpha });
-		bg.rect(0, 0, gameLayers.canvas.width, gameLayers.canvas.height);
 	}
 
 	/**
 	 * 居中显示
 	 */
 	private center(): void {
-		this.position.set(gameLayers.canvas.width / 2, gameLayers.canvas.height / 2);
+		this.position.set(0, 0);
+		this.spinner.position.set((App.ins.designWidth - this.spinner.width) / 2, (App.ins.designHeight - this.spinner.height) / 2);
+		this.text.position.set(this.spinner.x - this.text.width / 2, this.spinner.y + 40);
 	}
 
 	/**

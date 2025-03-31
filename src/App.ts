@@ -1,16 +1,30 @@
-import { Application, ApplicationOptions, Container, Point, PointData } from 'pixi.js';
-import { gameLayers } from '../frame/views/layers';
-import { changeScene } from '../frame/ctrls';
-import { StartScene } from './scenes/StartScene';
-export { gsap } from 'gsap';
+import { Application, ApplicationOptions, AssetInitOptions, Assets, Container, Point, PointData } from "pixi.js";
+import { gameLayers } from "./core/views/layers";
+import { changeScene } from "./core/ctrls";
+import { StartScene } from "./scenes/StartScene";
+import manifest from "./assets/manifest";
+export { gsap } from "gsap";
 
 interface AppOptions extends ApplicationOptions {
 	designWidth?: number;
 	designHeight?: number;
-	scaleMode?: 'fit' | 'fill' | 'fixed-width' | 'fixed-height';
+	scaleMode?: "fit" | "fill" | "fixed-width" | "fixed-height";
 	maxScale?: number;
 	minScale?: number;
 }
+
+export const Preload = async () => {
+	const initOptions: AssetInitOptions = {
+		basePath: "./src",
+	};
+
+	await Assets.init(initOptions);
+	for (let i = 0; i < manifest.bundles.length; i++) {
+		Assets.addBundle(manifest.bundles[i].name, manifest.bundles[i].assets);
+	}
+	// 优先加载通用资源
+	await Assets.loadBundle("common");
+};
 
 export class App extends Application {
 	public designWidth: number;
@@ -21,20 +35,31 @@ export class App extends Application {
 	private resizeObserver: ResizeObserver;
 	public gameContainer: Container;
 
+	// 静态实例引用
+	static _instance: App;
+
+	public static get ins(): App {
+		return App._instance;
+	}
+
 	async init(options: AppOptions) {
+		if (App._instance) return; // 防止重复初始化
+
 		const mergedOptions = {
 			autoDensity: true,
-			background: '#111111',
+			background: "#111111",
 			resolution: window.devicePixelRatio || 1,
 			...options,
 		};
 
 		await super.init(mergedOptions);
 
+		App._instance = this;
+
 		// 初始化设计尺寸和适配参数
 		this.designWidth = options.designWidth || 1920;
 		this.designHeight = options.designHeight || 1080;
-		this.scaleMode = options.scaleMode || 'fixed-height';
+		this.scaleMode = options.scaleMode || "fixed-height";
 		this.maxScale = options.maxScale;
 		this.minScale = options.minScale;
 
@@ -44,7 +69,10 @@ export class App extends Application {
 		// 初始化适配
 		this.setupAdaptation();
 
-		changeScene(StartScene);
+		// 预加载
+		await Preload();
+
+		changeScene(StartScene, {});
 	}
 
 	private setupAdaptation() {
@@ -74,16 +102,16 @@ export class App extends Application {
 		let scale = 1;
 
 		switch (this.scaleMode) {
-			case 'fit':
+			case "fit":
 				scale = Math.min(scaleX, scaleY);
 				break;
-			case 'fill':
+			case "fill":
 				scale = Math.max(scaleX, scaleY);
 				break;
-			case 'fixed-width':
+			case "fixed-width":
 				scale = scaleX;
 				break;
-			case 'fixed-height':
+			case "fixed-height":
 				scale = scaleY;
 				break;
 		}
@@ -101,7 +129,7 @@ export class App extends Application {
 		gameLayers.position.set((screenWidth - this.designWidth * scale) / 2, (screenHeight - this.designHeight * scale) / 2);
 
 		// 派发自定义事件
-		this.stage.emit('resize', { scale, screenWidth, screenHeight });
+		this.stage.emit("resize", { scale, screenWidth, screenHeight });
 	}
 
 	public destroy() {

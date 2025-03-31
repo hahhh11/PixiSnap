@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Assets, Container } from "pixi.js";
 
 /**
  *
@@ -14,10 +14,8 @@ export class Module extends Container {
 	 * 初始化资源和皮肤
 	 */
 	private init() {
-		this.preLoadRes().then(
+		this.preLoadAssets().then(
 			() => {
-				//添加皮肤配置
-				// if (this.skinName) RES.initSkinDisplay(this, this.skinName, this);
 				this.initUi();
 				this.initEvents();
 				this.onLoaded && this.onLoaded();
@@ -30,19 +28,23 @@ export class Module extends Container {
 	/**
 	 * 提前加载的资源
 	 */
-	protected preLoadRes() {
-		return new Promise((resolve, reject) => {
-			let groupNames = this.groupNames;
-			if (groupNames && groupNames.length) {
-				var arr: Promise<any>[] = [];
-				for (var i = 0; i < groupNames.length; i++) {
-					// arr.push(RES.loadGroup(groupNames[i]));
+	protected preLoadAssets() {
+		try {
+			return new Promise((resolve, reject) => {
+				let bandleName = this.bandleName;
+				if (bandleName && bandleName.length) {
+					var arr: Promise<any>[] = [];
+					for (var i = 0; i < bandleName.length; i++) {
+						arr.push(Assets.loadBundle(bandleName[i]));
+					}
+					Promise.all(arr).then(resolve, reject);
+				} else {
+					resolve(null);
 				}
-				Promise.all(arr).then(resolve, reject);
-			} else {
-				resolve(null);
-			}
-		});
+			});
+		} catch (err) {
+			console.error("preLoadAssets >>> ", err);
+		}
 	}
 
 	/**
@@ -64,7 +66,7 @@ export class Module extends Container {
 	/**
 	 * 可以有多个组
 	 */
-	get groupNames(): string[] | null {
+	get bandleName(): string[] | null {
 		return null;
 	}
 
@@ -111,7 +113,7 @@ export class Module extends Container {
 		//移除事件
 		this.removeEvents();
 		//派发销毁事件，主要用于场景及弹框控制
-		this.emit('onDestroy');
+		this.emit("onDestroy");
 		super.destroy();
 	}
 }
