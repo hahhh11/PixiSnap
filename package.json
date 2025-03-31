@@ -14,7 +14,7 @@
 	},
 	"type": "module",
 	"scripts": {
-		"dev": "NODE_ENV=development node scripts/generate-manifest.mjs & vite",
+		"dev": "node scripts/generate-manifest.mjs & vite",
 		"build": "vite build",
 		"preview": "vite preview"
 	}

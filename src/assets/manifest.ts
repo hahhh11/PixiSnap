@@ -15,8 +15,23 @@
     name: "loadingScene",
     assets: [
       {
+        alias: "loading_bg",
+        src: "./assets/loadingScene/loading_bg.jpg",
+        type: "image"
+      },
+      {
         alias: "loading_fill",
         src: "./assets/loadingScene/loading_fill.png",
+        type: "image"
+      }
+    ]
+  },
+  {
+    name: "startScene",
+    assets: [
+      {
+        alias: "start_bg",
+        src: "./assets/startScene/start_bg.jpg",
         type: "image"
       }
     ]
