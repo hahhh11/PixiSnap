@@ -2,7 +2,7 @@
  * @Author: 98Precent
  * @Date: 2025-03-31 10:30:06
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-03-31 12:54:06
+ * @LastEditTime: 2025-04-01 10:44:59
  * @FilePath: /PixiSnap/scripts/generate-manifest.mjs
  */
 
@@ -40,7 +40,7 @@ function generateManifest() {
 
         // 2. 为每个目录创建bundle
         for (const dirName of bundleDirs) {
-            if (dirName.split('.')[1] == 'ts') { continue }
+            if (['ts', 'DS_Store'].includes(dirName.split('.')[1])) { continue }
             const bundlePath = path.join(ASSETS_DIR, dirName);
             const assets = [];
 
@@ -50,7 +50,7 @@ function generateManifest() {
                 const stats = fs.statSync(filePath);
 
                 if (stats.isFile()) {
-                    if (dirName.split('.')[1] == 'ts') { return }
+                    if (['ts', 'DS_Store'].includes(dirName.split('.')[1])) { return }
                     const ext = path.extname(file).toLowerCase();
                     assets.push({
                         alias: path.basename(file, ext), // 去除扩展名的文件名作为id

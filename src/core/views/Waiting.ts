@@ -107,7 +107,7 @@ export class Waiting extends Container {
 	private updateSize(): void {
 		const bg = this.bg;
 		bg.clear();
-		bg.rect(0, 0, App._instance.designWidth, App._instance.designHeight);
+		bg.rect(0, 0, App.ins.designWidth, App.ins.designHeight);
 		bg.fill({ color: this.options.backgroundColor, alpha: this.options.backgroundAlpha });
 	}
 

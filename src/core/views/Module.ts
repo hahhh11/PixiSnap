@@ -1,5 +1,5 @@
-import gsap from 'gsap';
-import { Assets, Container } from 'pixi.js';
+import gsap from "gsap";
+import { Assets, Container } from "pixi.js";
 
 /**
  *
@@ -16,8 +16,8 @@ export class Module extends Container {
 	 */
 	private init() {
 		this.preLoadAssets().then(
-			() => {
-				this.initUi();
+			async () => {
+				await this.initUi();
 				this.initEvents();
 				this.onLoaded && this.onLoaded();
 			},
@@ -44,7 +44,7 @@ export class Module extends Container {
 				}
 			});
 		} catch (err) {
-			console.error('preLoadAssets >>> ', err);
+			console.error("preLoadAssets >>> ", err);
 		}
 	}
 
@@ -114,7 +114,7 @@ export class Module extends Container {
 		//移除事件
 		this.removeEvents();
 		//派发销毁事件，主要用于场景及弹框控制
-		this.emit('onDestroy');
+		this.emit("onDestroy", this);
 		super.destroy();
 	}
 }

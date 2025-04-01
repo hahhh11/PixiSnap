@@ -1,8 +1,8 @@
 import { Application, Container } from "pixi.js";
-import SceneCtrl from "../ctrls/SceneCtrl";
-import ModalCtrl from "../ctrls/ModalCtrl";
-import { WaitingCtrl } from "../ctrls";
-import { ToastCtrl } from "../ctrls/ToastCtrl";
+import SceneManager from "../managers/SceneManager";
+import ModalManager from "../managers/ModalManager";
+import { WaitingManager } from "../managers/WaitingManager";
+import { ToastManager } from "../managers/ToastManager";
 
 class Layers extends Container {
 	private _bottomLayer: Container;
@@ -42,13 +42,13 @@ class Layers extends Container {
 
 		// this.shareLayer.y = -this.stageOffsetY;
 		//初始化场景层级
-		SceneCtrl.instance.init(this.sceneLayer);
+		SceneManager.instance.init(this.sceneLayer);
 		//初始化弹框层级
-		ModalCtrl.instance.init(this.popupLayer);
+		ModalManager.instance.init(this.popupLayer);
 		//初始化提示层级
-		ToastCtrl.instance.init(this.toastLayer);
+		ToastManager.instance.init(this.toastLayer);
 		// 初始化Waiting层级
-		WaitingCtrl.instance.init(this.topLayer);
+		WaitingManager.instance.init(this.topLayer);
 	}
 
 	/**
