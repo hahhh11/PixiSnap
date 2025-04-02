@@ -4,6 +4,7 @@ import { showWaiting, hideWaiting } from "./WaitingManager";
 import { showToast } from "./ToastManager";
 import { Container, Graphics } from "pixi.js";
 import gsap from "gsap";
+import { App } from "../../App";
 
 export default class ModalManager {
 	/**
@@ -26,16 +27,16 @@ export default class ModalManager {
 
 	init(parent: Container) {
 		this._parent = parent;
-		let bg = new Graphics(); //Shape();
-		bg.fill({ color: 0 });
+		let bg = new Graphics();
 		bg.rect(
 			//引用适配
-			gameLayers.stageOffsetX - parent.x,
-			gameLayers.stageOffsetY - parent.y,
-			gameLayers.renderer.width,
-			gameLayers.renderer.height
+			0,
+			0,
+			App.ins.designWidth,
+			App.ins.designHeight
 		);
-		// bg.hitTestByPixel = false;
+		bg.fill({ color: 0x000000, alpha: 0.5 });
+		bg.interactive = true;
 		bg.visible = false;
 		this._parent.addChild(bg);
 		this._bg = bg;
@@ -75,9 +76,9 @@ export default class ModalManager {
 		}
 		//没有弹框的时候
 		if (!this.stacks.length) {
-			// this._bg.visible = false;
-			// this._current = null;
-			// this._parent.visible = false;
+			this._bg.visible = false;
+			this._current = null;
+			this._parent.visible = false;
 			if (this._bg.visible) {
 				//原先背景存在时，待测试
 				this.bgAni = "hide";
@@ -87,7 +88,7 @@ export default class ModalManager {
 					duration: 0.2, // 200ms = 0.2s
 					ease: "power2.out", // GSAP中的power2.out相当于cubicOut
 					onComplete: () => {
-						this._bg && (this._bg.visible = false);
+						this._bg.visible = false;
 						this._current = null;
 						this._parent && (this._parent.visible = false);
 					},
@@ -97,17 +98,19 @@ export default class ModalManager {
 			//显示弹框层
 			this._parent.visible = true;
 			if (this.bgAni == "hide") {
+				debugger;
 				//如果正在执行蒙层消失动画，
 				this.bgAni = "show";
 				gsap.killTweensOf(this._bg);
-				this._bg.alpha = 0.7;
+				this._bg.alpha = 0.5;
 			}
 			//如果首次出现弹框，加个动画
 			if (this._bg.visible === false) {
+				console.log(this);
 				this._bg.visible = true;
 				this._bg.alpha = 0;
 				gsap.to(this._bg, {
-					alpha: 0.7,
+					alpha: 0.5,
 					duration: 0.2, // 200ms = 0.2秒
 					ease: "power2.out", // 相当于TweenJS的Ease.cubicOut
 				});

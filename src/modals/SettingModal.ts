@@ -2,7 +2,7 @@
  * @Author: 98Precent
  * @Date: 2025-04-01 15:26:51
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-01 17:31:08
+ * @LastEditTime: 2025-04-02 10:35:44
  * @FilePath: /PixiSnap/src/modals/SettingModal.ts
  */
 import { App } from "../App";
@@ -17,10 +17,6 @@ export class SettingModal extends Modal {
 	bg;
 	closeBtn;
 	async initUi() {
-		let bg = UI.rect(0, 0, App.ins.designWidth, App.ins.designHeight, 0x000000, 0.2);
-		bg.interactive = false;
-		this.addChild(bg);
-
 		let modalBg = await UI.nineSliceSprite("Button_Blue_9Slides", 20, 20, 20, 40);
 		modalBg.width = 1000;
 		modalBg.height = 800;
@@ -45,7 +41,6 @@ export class SettingModal extends Modal {
 	removeEvents(): void {
 		super.removeEvents();
 		this.closeBtn.off("click", this.onClickCloseBtn);
-		this.closeBtn.off("pointDown", this.onClickCloseBtn);
 		this.closeBtn.onpointerdown = null;
 	}
 }
