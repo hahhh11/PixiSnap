@@ -1,6 +1,6 @@
 import { Application, ApplicationOptions, AssetInitOptions, Assets, Container, Point, PointData } from "pixi.js";
-import { gameLayers } from "./core/views/layers";
-import { changeScene } from "./core/managers/Index";
+import { gameLayers } from "./core/layout/views/layers";
+import { changeScene } from "./core/layout/managers/Index";
 import manifest from "./assets/manifest";
 import { LoadingScene } from "./scenes/LoadingScene";
 export { gsap } from "gsap";

@@ -7,9 +7,9 @@
  */
 import { Assets } from "pixi.js";
 import { App } from "../App";
-import { Scene } from "../core/views/Scene";
+import { Scene } from "../core/layout/views/Scene";
 import { UI } from "../ui/UI";
-import { changeScene, waitAsync } from "../core/managers/Index";
+import { changeScene, waitAsync } from "../core/layout/managers/Index";
 import { StartScene } from "./StartScene";
 import { GameScene } from "./GameScene";
 

@@ -6,9 +6,9 @@
  * @FilePath: /PixiSnap/src/scenes/StartScene.ts
  */
 import { Assets, Graphics, Sprite } from "pixi.js";
-import { Scene } from "../core/views/Scene";
+import { Scene } from "../core/layout/views/Scene";
 import { UI } from "../ui/UI";
-import { hideWaiting, showWaiting } from "../core/managers/Index";
+import { hideWaiting, showWaiting } from "../core/layout/managers/Index";
 
 export class StartScene extends Scene {
 	get bandleName() {

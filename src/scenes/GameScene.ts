@@ -7,10 +7,10 @@
  */
 import { FederatedMouseEvent } from "pixi.js";
 import { App } from "../App";
-import { Scene } from "../core/views/Scene";
+import { Scene } from "../core/layout/views/Scene";
 import { UI } from "../ui/UI";
 import { GameCharacter } from "../entities/characters/GameCharacter";
-import { showModal } from "../core/managers/Index";
+import { showModal } from "../core/layout/managers/Index";
 import { SettingModal } from "../modals/SettingModal";
 
 export class GameScene extends Scene {

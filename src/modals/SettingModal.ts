@@ -6,7 +6,7 @@
  * @FilePath: /PixiSnap/src/modals/SettingModal.ts
  */
 import { App } from "../App";
-import { Modal } from "../core/views/Modal";
+import { Modal } from "../core/layout/views/Modal";
 import { UI } from "../ui/UI";
 
 export class SettingModal extends Modal {

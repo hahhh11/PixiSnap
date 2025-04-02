@@ -4,7 +4,7 @@ import { showWaiting, hideWaiting } from "./WaitingManager";
 import { showToast } from "./ToastManager";
 import { Container, Graphics } from "pixi.js";
 import gsap from "gsap";
-import { App } from "../../App";
+import { App } from "../../../App";
 
 export default class ModalManager {
 	/**

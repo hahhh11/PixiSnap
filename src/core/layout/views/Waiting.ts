@@ -1,6 +1,6 @@
 import { Application, Container, Graphics, Text, TextStyle, Ticker } from "pixi.js";
 import { gameLayers } from "./layers";
-import { App } from "../../App";
+import { App } from "../../../App";
 interface WaitingOptions {
 	/** 背景颜色（默认半透明黑色） */
 	backgroundColor?: number;
