@@ -2,7 +2,7 @@
  * @Author: 98Precent
  * @Date: 2025-03-31 10:30:06
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-01 10:44:59
+ * @LastEditTime: 2025-04-03 16:02:21
  * @FilePath: /PixiSnap/scripts/generate-manifest.mjs
  */
 
@@ -50,7 +50,10 @@ function generateManifest() {
                 const stats = fs.statSync(filePath);
 
                 if (stats.isFile()) {
-                    if (['ts', 'DS_Store'].includes(dirName.split('.')[1])) { return }
+                    // 新增条件：忽略隐藏文件、ts文件以及.DS_Store
+                    if (file.startsWith('.') || file.endsWith('.ts') || file === 'DS_Store') {
+                        return;
+                    }
                     const ext = path.extname(file).toLowerCase();
                     assets.push({
                         alias: path.basename(file, ext), // 去除扩展名的文件名作为id

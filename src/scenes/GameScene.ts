@@ -2,16 +2,17 @@
  * @Author: 98Precent
  * @Date: 2025-04-01 10:46:12
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-01 16:58:13
+ * @LastEditTime: 2025-04-03 18:25:03
  * @FilePath: /PixiSnap/src/scenes/GameScene.ts
  */
-import { FederatedMouseEvent } from "pixi.js";
+import { Assets, FederatedMouseEvent, Texture } from "pixi.js";
 import { App } from "../App";
 import { Scene } from "../core/layout/views/Scene";
 import { UI } from "../ui/UI";
 import { GameCharacter } from "../entities/characters/GameCharacter";
 import { showModal } from "../core/layout/managers/Index";
 import { SettingModal } from "../modals/SettingModal";
+import { TerrainSystem, TerrainTile, TextureAtlas } from "../core/terrain/components/TerrainTile";
 
 export class GameScene extends Scene {
 	get bandleName(): string[] {
@@ -23,6 +24,14 @@ export class GameScene extends Scene {
 		let bg = UI.rect(0, 0, App.ins.designWidth, App.ins.designHeight, 0xeeeeee);
 		this.addChild(bg);
 		this.enableMouseEvt(true);
+
+		let terrainSystem = new TerrainSystem(3, 3, 64);
+		terrainSystem.x = 50;
+		terrainSystem.y = 50;
+		this.addChild(terrainSystem);
+		// console.log(terrainSystem);
+
+		// terrainSystem.addChild(await UI.img("Tilemap_Grass")).scale.set(2, 2);
 
 		let warrior = (this.warrior = await UI.gameCharacter(
 			{
@@ -71,7 +80,7 @@ export class GameScene extends Scene {
 		);
 		this.addChild(warrior2);
 
-		showModal(SettingModal);
+		// showModal(SettingModal);
 	}
 
 	initEvents(): void {
