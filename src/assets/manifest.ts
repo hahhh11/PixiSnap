@@ -2,6 +2,16 @@
             var manifest = {
                 bundles: [
   {
+    name: "common",
+    assets: [
+      {
+        alias: "bg",
+        src: "./assets/common/bg.png",
+        type: "image"
+      }
+    ]
+  },
+  {
     name: "Deco",
     assets: [
       {
@@ -92,6 +102,26 @@
       {
         alias: "Deco_18",
         src: "./assets/Deco/Deco_18.png",
+        type: "image"
+      },
+      {
+        alias: "Rocks_01",
+        src: "./assets/Deco/Rocks_01.png",
+        type: "image"
+      },
+      {
+        alias: "Rocks_02",
+        src: "./assets/Deco/Rocks_02.png",
+        type: "image"
+      },
+      {
+        alias: "Rocks_03",
+        src: "./assets/Deco/Rocks_03.png",
+        type: "image"
+      },
+      {
+        alias: "Rocks_04",
+        src: "./assets/Deco/Rocks_04.png",
         type: "image"
       }
     ]
@@ -207,6 +237,116 @@
     ]
   },
   {
+    name: "loadingScene",
+    assets: [
+      {
+        alias: "loading_bg",
+        src: "./assets/loadingScene/loading_bg.jpg",
+        type: "image"
+      },
+      {
+        alias: "loading_fill",
+        src: "./assets/loadingScene/loading_fill.png",
+        type: "image"
+      }
+    ]
+  },
+  {
+    name: "Resources",
+    assets: [
+      {
+        alias: "GoldMine_Active",
+        src: "./assets/Resources/GoldMine_Active.png",
+        type: "image"
+      },
+      {
+        alias: "GoldMine_Destroyed",
+        src: "./assets/Resources/GoldMine_Destroyed.png",
+        type: "image"
+      },
+      {
+        alias: "GoldMine_Inactive",
+        src: "./assets/Resources/GoldMine_Inactive.png",
+        type: "image"
+      },
+      {
+        alias: "G_Idle",
+        src: "./assets/Resources/G_Idle.png",
+        type: "image"
+      },
+      {
+        alias: "G_Idle_(NoShadow)",
+        src: "./assets/Resources/G_Idle_(NoShadow).png",
+        type: "image"
+      },
+      {
+        alias: "G_Spawn",
+        src: "./assets/Resources/G_Spawn.png",
+        type: "image"
+      },
+      {
+        alias: "HappySheep_All",
+        src: "./assets/Resources/HappySheep_All.png",
+        type: "image"
+      },
+      {
+        alias: "HappySheep_Bouncing",
+        src: "./assets/Resources/HappySheep_Bouncing.png",
+        type: "image"
+      },
+      {
+        alias: "HappySheep_Idle",
+        src: "./assets/Resources/HappySheep_Idle.png",
+        type: "image"
+      },
+      {
+        alias: "M_Idle",
+        src: "./assets/Resources/M_Idle.png",
+        type: "image"
+      },
+      {
+        alias: "M_Idle_(NoShadow)",
+        src: "./assets/Resources/M_Idle_(NoShadow).png",
+        type: "image"
+      },
+      {
+        alias: "M_Spawn",
+        src: "./assets/Resources/M_Spawn.png",
+        type: "image"
+      },
+      {
+        alias: "Tree",
+        src: "./assets/Resources/Tree.png",
+        type: "image"
+      },
+      {
+        alias: "W_Idle",
+        src: "./assets/Resources/W_Idle.png",
+        type: "image"
+      },
+      {
+        alias: "W_Idle_(NoShadow)",
+        src: "./assets/Resources/W_Idle_(NoShadow).png",
+        type: "image"
+      },
+      {
+        alias: "W_Spawn",
+        src: "./assets/Resources/W_Spawn.png",
+        type: "image"
+      }
+    ]
+  },
+  {
+    name: "startScene",
+    assets: [
+      {
+        alias: "start_bg",
+        src: "./assets/startScene/start_bg.jpg",
+        type: "image"
+      }
+    ]
+  },
+  {
     name: "Terrain",
     assets: [
       {
@@ -217,26 +357,6 @@
       {
         alias: "Foam",
         src: "./assets/Terrain/Foam.png",
-        type: "image"
-      },
-      {
-        alias: "Rocks_01",
-        src: "./assets/Terrain/Rocks_01.png",
-        type: "image"
-      },
-      {
-        alias: "Rocks_02",
-        src: "./assets/Terrain/Rocks_02.png",
-        type: "image"
-      },
-      {
-        alias: "Rocks_03",
-        src: "./assets/Terrain/Rocks_03.png",
-        type: "image"
-      },
-      {
-        alias: "Rocks_04",
-        src: "./assets/Terrain/Rocks_04.png",
         type: "image"
       },
       {
@@ -260,8 +380,13 @@
         type: "image"
       },
       {
-        alias: "Water",
-        src: "./assets/Terrain/Water.png",
+        alias: "Tilemap_Straw",
+        src: "./assets/Terrain/Tilemap_Straw.png",
+        type: "image"
+      },
+      {
+        alias: "Tilemap_Water",
+        src: "./assets/Terrain/Tilemap_Water.png",
         type: "image"
       }
     ]
@@ -742,41 +867,6 @@
       {
         alias: "Warrior_Yellow",
         src: "./assets/Warrior/Warrior_Yellow.png",
-        type: "image"
-      }
-    ]
-  },
-  {
-    name: "common",
-    assets: [
-      {
-        alias: "bg",
-        src: "./assets/common/bg.png",
-        type: "image"
-      }
-    ]
-  },
-  {
-    name: "loadingScene",
-    assets: [
-      {
-        alias: "loading_bg",
-        src: "./assets/loadingScene/loading_bg.jpg",
-        type: "image"
-      },
-      {
-        alias: "loading_fill",
-        src: "./assets/loadingScene/loading_fill.png",
-        type: "image"
-      }
-    ]
-  },
-  {
-    name: "startScene",
-    assets: [
-      {
-        alias: "start_bg",
-        src: "./assets/startScene/start_bg.jpg",
         type: "image"
       }
     ]

@@ -6,7 +6,8 @@
  * @FilePath: /PixiSnap/src/core/terrain/components/TileType.ts
  */
 export enum TileType {
-	Grass = "Grass", // 平原
+	Grass = "Grass", // 绿草
+	Straw = "Straw", // 干草 
 	Water = "Water", // 水域
 	Mountain = "Mountain", // 山脉
 }

@@ -1,15 +1,16 @@
-import { Assets, Graphics, NineSliceSprite, Sprite, Texture } from "pixi.js";
-import { ImageProgressBar, ImageProgressBarOptions } from "./componets/ImageProgressBar";
-import { SpriteSheetAnimator } from "../core/animations/SpriteSheetAnimator";
-import { GameCharacter } from "../entities/characters/GameCharacter";
-import { Button } from "./componets/Button";
+import { Assets, Graphics, NineSliceSprite, Sprite, Texture } from 'pixi.js';
+import { ImageProgressBar, ImageProgressBarOptions } from './componets/ImageProgressBar';
+import { SpriteSheetAnimator } from '../core/animations/SpriteSheetAnimator';
+import { Character } from '../game/entities/Character';
+import { Button } from './componets/Button';
+import { Tree } from '../game/entities/Tree';
 
 /*
  * @Author: 98Precent
  * @Date: 2025-03-31 10:21:28
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-01 17:07:20
- * @FilePath: /PixiSnap/src/ui/UI.ts
+ * @LastEditTime: 2025-04-04 12:07:58
+ * @FilePath: \PixiSnap\src\ui\UI.ts
  */
 export class UI {
 	static rect(x, y, width, height, color = 0x00000, alpha = 1) {
@@ -48,10 +49,10 @@ export class UI {
 			texture = await Assets.load(src);
 		}
 		let sprite = new NineSliceSprite({ texture, leftWidth, rightWidth, topHeight, bottomHeight });
-		if (width !== "undefined") {
+		if (width !== 'undefined') {
 			sprite.width = width;
 		}
-		if (height !== "undefined") {
+		if (height !== 'undefined') {
 			sprite.height = height;
 		}
 		sprite.position.set(x, y);
@@ -100,13 +101,8 @@ export class UI {
 		return button;
 	}
 
-	static async imageProgressBar(
-		options: { fillTexture: Texture | string; width?: number; height?: number; [key: string]: any },
-		x = 0,
-		y = 0,
-		value = 0
-	): Promise<ImageProgressBar> {
-		const texture = typeof options.fillTexture === "string" ? await Texture.from(options.fillTexture) : options.fillTexture;
+	static async imageProgressBar(options: { fillTexture: Texture | string; width?: number; height?: number; [key: string]: any }, x = 0, y = 0, value = 0): Promise<ImageProgressBar> {
+		const texture = typeof options.fillTexture === 'string' ? await Texture.from(options.fillTexture) : options.fillTexture;
 
 		// 自动获取纹理尺寸作为默认值
 		const finalOptions = {
@@ -129,10 +125,17 @@ export class UI {
 		return ani;
 	}
 
-	static async gameCharacter(config, x = 0, y = 0) {
-		let character = new GameCharacter(config);
+	static async character(config, x = 0, y = 0) {
+		let character = new Character(config);
 		await character.load(config.animationConfig.resource);
 		character.position.set(x, y);
 		return character;
+	}
+
+	static async tree(config, x = 0, y = 0) {
+		let tree = new Tree(config);
+		await tree.load(config);
+		tree.position.set(x, y);
+		return tree;
 	}
 }

@@ -1,25 +1,39 @@
-import { SpriteAnimationOptions, SpriteSheetAnimator } from "../../core/animations/SpriteSheetAnimator";
-import { Container, Point, Rectangle } from "pixi.js";
+import { SpriteAnimationOptions, SpriteSheetAnimator } from '../../core/animations/SpriteSheetAnimator';
+import { Container, Point, Rectangle } from 'pixi.js';
+import { KeyboardService } from '../../core/input/KeyboardService';
+import { App } from '../../App';
+import { GameUtils } from '../../utils/GameUtils';
 
-type CharacterState = "idle" | "walk" | "attack" | "hurt" | "die";
-type Direction = "left" | "right" | "up" | "down";
+type CharacterState = 'idle' | 'walk' | 'attack' | 'skill' | 'hurt' | 'die';
+type Direction = 'left' | 'right' | 'up' | 'down';
 
 interface CharacterOptions {
 	speed?: number;
 	health?: number;
 	scale?: number;
 	animationConfig?: SpriteAnimationOptions;
+	skills?: SkillConfig[];
 }
 
-export class GameCharacter extends Container {
+interface SkillConfig {
+	name: string;
+	cooldown: number;
+	animation: string;
+	energyCost: number;
+}
+
+export class Character extends Container {
 	private animator: SpriteSheetAnimator;
-	private _state: CharacterState = "idle";
-	private _direction: Direction = "right";
+	private _state: CharacterState = 'idle';
+	private _direction: Direction = 'right';
 	private _speed: number;
 	private _health: number;
 	private _maxHealth: number;
 	private isAttacking = false;
+	// private skills: Map<string, Skill> = new Map();
+	private activeSkill: string | null = null;
 	private movementVector = new Point(0, 0);
+	private keyboard = KeyboardService.getInstance();
 
 	constructor(options: CharacterOptions) {
 		super();
@@ -35,112 +49,133 @@ export class GameCharacter extends Container {
 			this.scale.set(options.scale);
 		}
 
+		this.setState('idle');
+
 		// 启用交互
 		this.interactive = true;
-		this.on("pointerdown", this.handleClick);
+		this.on('click', this.handleClick);
+
+		App.ins.ticker.add((ticker) => {
+			this.update(ticker);
+		});
 	}
 
 	// 加载角色资源
 	async load(resource: string | { json: string; image: string }): Promise<void> {
 		await this.animator.load(resource);
-		this.playAnimation("idle");
+		this.playAnimation('idle');
 	}
 
 	// 更新角色状态（每帧调用）
-	update(delta: number): void {
+	update(ticker): void {
 		// 处理移动
-		if (this._state === "walk" && (this.movementVector.x !== 0 || this.movementVector.y !== 0)) {
-			this.x += this.movementVector.x * this._speed * delta;
-			this.y += this.movementVector.y * this._speed * delta;
+		if (this._state === 'walk' && (this.movementVector.x !== 0 || this.movementVector.y !== 0)) {
+			this.x += this.movementVector.x * this._speed * ticker.deltaTime;
+			this.y += this.movementVector.y * this._speed * ticker.deltaTime;
 		}
 
+		// 处理输入
+		this.handleInput();
 		// 更新动画方向
 		this.updateAnimationByDirection();
 	}
 
+	handleInput() {
+		if (this._state === 'die') return;
+
+		// 获取键盘输入
+		const input = this.keyboard.getMovementVector();
+		this.movementVector.set(input.x, input.y);
+
+		// 攻击
+		if (this.keyboard.isKeyDown('f') && !this.isAttacking) {
+			this.attack();
+		}
+	}
+
 	// 控制方法
 	move(direction: Point): void {
-		if (this._state === "die" || this.isAttacking) return;
+		if (this._state === 'die' || this.isAttacking) return;
 
 		this.movementVector = direction;
 
 		// 确定主要方向（用于动画选择）
 		if (Math.abs(direction.x) > Math.abs(direction.y)) {
-			this._direction = direction.x > 0 ? "right" : "left";
+			this._direction = direction.x > 0 ? 'right' : 'left';
 		} else if (direction.y !== 0) {
-			this._direction = direction.y > 0 ? "down" : "up";
+			this._direction = direction.y > 0 ? 'down' : 'up';
 		}
 
-		this.setState("walk");
+		this.setState('walk');
 	}
 
 	stop(): void {
-		if (this._state === "die") return;
+		if (this._state === 'die') return;
 
 		this.movementVector.set(0, 0);
-		this.setState("idle");
+		this.setState('idle');
 	}
 
 	async attack(aniName?: string): Promise<void> {
-		if (this._state === "die" || this.isAttacking) return;
+		if (this._state === 'die' || this.isAttacking) return;
 
 		this.isAttacking = true;
 
-		this.setState("attack", aniName, false);
+		this.setState('attack', aniName, false);
 
 		// 等待攻击动画完成
 		await new Promise<void>((resolve) => {
-			this.animator.once("complete", () => {
+			this.animator.once('complete', () => {
 				this.isAttacking = false;
-				this.setState(this.movementVector.x || this.movementVector.y ? "walk" : "idle");
+				this.setState(this.movementVector.x || this.movementVector.y ? 'walk' : 'idle');
 				resolve();
 			});
 		});
 	}
 
 	takeDamage(amount: number): void {
-		if (this._state === "die") return;
+		if (this._state === 'die') return;
 
 		this._health = Math.max(0, this._health - amount);
 
 		if (this._health <= 0) {
 			this.die();
-		} else if (this.animator.hasAnimation("hurt")) {
-			this.playAnimation("hurt", false).then(() => {
+		} else if (this.animator.hasAnimation('hurt')) {
+			this.playAnimation('hurt', false).then(() => {
 				this.setState(this._state); // 恢复之前的状态
 			});
 		}
 	}
 
 	die(): void {
-		this._state = "die";
+		this._state = 'die';
 		this.movementVector.set(0, 0);
 
-		if (this.animator.hasAnimation("die")) {
-			this.playAnimation("die", false);
+		if (this.animator.hasAnimation('die')) {
+			this.playAnimation('die', false);
 		} else {
-			this.playAnimation("idle");
+			this.playAnimation('idle');
 		}
 
-		this.emit("died");
+		this.emit('died');
 	}
 
 	revive(health: number = this._maxHealth): void {
 		this._health = health;
-		this._state = "idle";
-		this.playAnimation("idle");
+		this._state = 'idle';
+		this.playAnimation('idle');
 	}
 
 	// 私有方法
 	private setState(newState: CharacterState, aniName?: string, loop: boolean = true): void {
-		if (this._state === newState || this._state === "die") return;
+		if (this._state === newState || this._state === 'die') return;
 
 		this._state = newState;
 		this.playAnimation(aniName || newState, loop);
 	}
 
 	private updateAnimationByDirection(): void {
-		const directionSuffix = this._direction ? `_${this._direction}` : "";
+		const directionSuffix = this._direction ? `_${this._direction}` : '';
 		const animationName = `${this._state}${directionSuffix}`;
 
 		if (this.animator.hasAnimation(animationName)) {
@@ -161,7 +196,7 @@ export class GameCharacter extends Container {
 		if (!loop) {
 			return new Promise<void>((resolve) => {
 				this.animator.playAnimation(name, loop, () => {
-					this.animator.emit("complete");
+					this.animator.emit('complete');
 					resolve();
 				});
 			});
@@ -171,8 +206,9 @@ export class GameCharacter extends Container {
 	}
 
 	private handleClick(): void {
-		if (this._state !== "die") {
-			this.attack();
+		if (this._state !== 'die') {
+			let attackName = ['attack1', 'attack2'][GameUtils.randomInt(0, 1)];
+			this.attack(attackName);
 		}
 	}
 
@@ -202,6 +238,6 @@ export class GameCharacter extends Container {
 	}
 
 	get isAlive(): boolean {
-		return this._state !== "die";
+		return this._state !== 'die';
 	}
 }

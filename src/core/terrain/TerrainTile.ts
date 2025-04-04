@@ -2,11 +2,13 @@
  * @Author: 98Precent
  * @Date: 2025-04-02 17:14:45
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-03 18:23:17
- * @FilePath: /PixiSnap/src/core/terrain/components/TerrainTile.ts
+ * @LastEditTime: 2025-04-04 11:24:01
+ * @FilePath: \PixiSnap\src\core\terrain\TerrainTile.ts
  */
-import { AnimatedSprite, Assets, Container, Rectangle, Sprite, Text, Texture } from "pixi.js";
-import { TileType } from "./TileType";
+import { AnimatedSprite, Assets, Container, NineSliceSprite, Rectangle, Sprite, Text, Texture } from 'pixi.js';
+import { TileType } from './TileType';
+import { TileConfig } from './TileConfig';
+import { GameUtils } from '../../utils/GameUtils';
 
 // 纹理加载器
 export class TextureAtlas {
@@ -32,9 +34,9 @@ export class TerrainTile extends Container {
 	terrainAtlas: TextureAtlas;
 	static neighbors = [
 		[0, -1], // 上
-		[1, 0], // 右
+		[-1, 0], // 右
 		[0, 1], // 下
-		[-1, 0], // 左
+		[1, 0], // 左
 	];
 
 	constructor(terrainAtlas, type) {
@@ -47,19 +49,18 @@ export class TerrainTile extends Container {
 
 	updateTexture(grid: TileType[][], x: number, y: number) {
 		const currentType = grid[y][x];
-		let bitString = "";
+		let bitString = '';
 
 		// 仅遍历四方向邻接
 		TerrainTile.neighbors.forEach(([dx, dy], i) => {
 			const nx = x + dx;
 			const ny = y + dy;
 			const neighborType = grid[ny]?.[nx];
-			console.log(neighborType, currentType);
 			bitString += neighborType === currentType ? 1 : 0;
 		});
 
-		// 输出验证（应为 0-15 的整数）
-		console.log("Correct Bitmask:", bitString);
+		// 输出验证
+		// console.log('Correct Bitmask:', bitString);
 
 		this.baseVisual.texture = this.calculateTexture(bitString);
 	}
@@ -71,28 +72,28 @@ export class TerrainTile extends Container {
 		return this.terrainAtlas.textures[index];
 	}
 
-	private maskToIndex(bitmask: string): number {
+	private maskToIndex(bitString: string): number {
 		// const posMap = ["3*3左上", "3*3上", "3*3右上", "1*3上", "3*3左", "3*3中", "3*3右", "1*3中", "3*3左下", "3*3下", "3*3右下", "1*3下", "3*1左", "3*1中", "3*1右", "1*1独立"];
 		const indexMap = {
-			"0011": 0,
-			"0111": 1,
-			"0110": 3,
-			"0010": 4,
-			"1011": 5,
-			"1111": 6,
-			"1110": 7,
-			"1010": 8,
-			"1001": 9,
-			"1101": 10,
-			"1100": 11,
-			"1000": 12,
-			"0001": 13,
-			"0101": 14,
-			"0000": 15,
+			'0011': 0,
+			'0111': 1,
+			'0110': 2,
+			'0010': 3,
+			'1011': 4,
+			'1111': 5,
+			'1110': 6,
+			'1010': 7,
+			'1001': 8,
+			'1101': 9,
+			'1100': 10,
+			'1000': 11,
+			'0001': 12,
+			'0101': 13,
+			'0100': 14,
+			'0000': 15,
 		};
-		console.log(bitmask, indexMap[bitmask]);
 
-		return indexMap[bitmask];
+		return indexMap[bitString];
 	}
 }
 
@@ -100,6 +101,8 @@ export class TerrainTile extends Container {
 export class TerrainSystem extends Container {
 	private grid: TileType[][] = [];
 	private tileSize: number;
+	private bg: NineSliceSprite;
+	private tilesContainer = new Container();
 
 	constructor(private widthIdx: number, private heightIdx: number, tileSize: number = 64) {
 		super();
@@ -108,6 +111,10 @@ export class TerrainSystem extends Container {
 	}
 
 	private async initTerrain() {
+		this.bg = this.addChild(new NineSliceSprite(await Assets.load('Tilemap_Water')));
+		this.bg.width = this.widthIdx * this.tileSize;
+		this.bg.height = this.heightIdx * this.tileSize;
+		this.addChild(this.tilesContainer);
 		await this.initGrid();
 		await this.initTiles();
 	}
@@ -116,8 +123,9 @@ export class TerrainSystem extends Container {
 		for (let y = 0; y < this.heightIdx; y++) {
 			this.grid[y] = [];
 			for (let x = 0; x < this.widthIdx; x++) {
-				this.grid[y][x] = TileType.Grass;
-				this.addChild(await this.createTile(x, y, TileType.Grass));
+				let type = [TileType.Grass, TileType.Straw][GameUtils.randomInt(0, 1)];
+				this.grid[y][x] = type;
+				this.tilesContainer.addChild(await this.createTile(x, y, type));
 			}
 		}
 	}
@@ -125,19 +133,17 @@ export class TerrainSystem extends Container {
 	private async initTiles() {
 		for (let y = 0; y < this.heightIdx; y++) {
 			for (let x = 0; x < this.widthIdx; x++) {
-				(this.children[y * this.widthIdx + x] as TerrainTile).updateTexture(this.grid, x, y);
+				(this.tilesContainer.children[y * this.widthIdx + x] as TerrainTile).updateTexture(this.grid, x, y);
 				// this.setTile(x, y, TileType.Grass);
 			}
 		}
 	}
 
 	private async createTile(x: number, y: number, type: TileType): Promise<TerrainTile> {
-		let tileAssetsName = "";
-		if (type === TileType.Grass) {
-			tileAssetsName = "Tilemap_Grass";
-		}
-		let texture = await Assets.load(tileAssetsName);
-		let terrainAtlas = new TextureAtlas(texture, 4, 4);
+		let { name, splitX, splitY } = TileConfig[type];
+
+		let texture = await Assets.load(name);
+		let terrainAtlas = new TextureAtlas(texture, splitX, splitY);
 		const tile = new TerrainTile(terrainAtlas, type);
 		tile.position.set(x * this.tileSize, y * this.tileSize);
 
@@ -146,9 +152,7 @@ export class TerrainSystem extends Container {
 
 	public setTile(x: number, y: number, type: TileType) {
 		this.grid[y][x] = type;
-		// 根据临格决定自己用什么纹理
-		// this.updateTexture(x, y);
-		// this.updateNeighbors(x, y);
+		this.updateNeighbors(x, y);
 	}
 
 	private updateNeighbors(x: number, y: number) {
@@ -157,7 +161,7 @@ export class TerrainSystem extends Container {
 				const nx = x + dx;
 				const ny = y + dy;
 				if (this.isValid(nx, ny)) {
-					(this.children[ny * this.widthIdx + nx] as TerrainTile).updateTexture(this.grid, nx, ny);
+					(this.tilesContainer.children[ny * this.widthIdx + nx] as TerrainTile).updateTexture(this.grid, nx, ny);
 				}
 			}
 		}
