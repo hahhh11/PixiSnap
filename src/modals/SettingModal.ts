@@ -2,8 +2,8 @@
  * @Author: 98Precent
  * @Date: 2025-04-01 15:26:51
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-02 10:35:44
- * @FilePath: /PixiSnap/src/modals/SettingModal.ts
+ * @LastEditTime: 2025-04-04 13:03:32
+ * @FilePath: \PixiSnap\src\modals\SettingModal.ts
  */
 import { App } from "../App";
 import { Modal } from "../core/layout/views/Modal";
@@ -35,12 +35,10 @@ export class SettingModal extends Modal {
 	initEvents(): void {
 		super.initEvents();
 		this.closeBtn.on("click", this.onClickCloseBtn);
-		this.closeBtn.onpointerdown = this.onClickCloseBtn;
 	}
 
 	removeEvents(): void {
 		super.removeEvents();
 		this.closeBtn.off("click", this.onClickCloseBtn);
-		this.closeBtn.onpointerdown = null;
 	}
 }

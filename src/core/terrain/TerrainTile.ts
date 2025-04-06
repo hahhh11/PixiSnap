@@ -2,13 +2,14 @@
  * @Author: 98Precent
  * @Date: 2025-04-02 17:14:45
  * @LastEditors: Do not edit
- * @LastEditTime: 2025-04-04 11:24:01
+ * @LastEditTime: 2025-04-06 09:32:30
  * @FilePath: \PixiSnap\src\core\terrain\TerrainTile.ts
  */
 import { AnimatedSprite, Assets, Container, NineSliceSprite, Rectangle, Sprite, Text, Texture } from 'pixi.js';
 import { TileType } from './TileType';
 import { TileConfig } from './TileConfig';
 import { GameUtils } from '../../utils/GameUtils';
+import { SpriteSheetAnimator } from '../animations/SpriteSheetAnimator';
 
 // 纹理加载器
 export class TextureAtlas {
@@ -47,22 +48,40 @@ export class TerrainTile extends Container {
 		this.addChild(this.baseVisual);
 	}
 
-	updateTexture(grid: TileType[][], x: number, y: number) {
+	async updateTexture(grid: TileType[][], x: number, y: number) {
 		const currentType = grid[y][x];
 		let bitString = '';
-
+		let wave = false;
 		// 仅遍历四方向邻接
 		TerrainTile.neighbors.forEach(([dx, dy], i) => {
 			const nx = x + dx;
 			const ny = y + dy;
 			const neighborType = grid[ny]?.[nx];
 			bitString += neighborType === currentType ? 1 : 0;
+			if (neighborType === TileType.Water && currentType !== TileType.Water) {
+				wave = true;
+			}
 		});
 
 		// 输出验证
 		// console.log('Correct Bitmask:', bitString);
 
 		this.baseVisual.texture = this.calculateTexture(bitString);
+
+		if (wave) {
+			let ani = new SpriteSheetAnimator({
+				frameWidth: 192,
+				frameHeight: 192,
+				globalSpeed: 0.3,
+				animations: [{ name: 'wave', startFrame: 0, endFrame: 7, speed: 0.15, loop: true }],
+			});
+			let waveani = await ani.load('Foam');
+			waveani.playAnimation('wave');
+			waveani.x = this.x - 64;
+			waveani.y = this.y - 64;
+			console.log(this.parent.parent);
+			(this.parent.parent as TerrainSystem).waveContainer.addChildAt(waveani, 0);
+		}
 	}
 
 	private calculateTexture(bitString: string): Texture {
@@ -99,10 +118,12 @@ export class TerrainTile extends Container {
 
 //地形系统核心;
 export class TerrainSystem extends Container {
-	private grid: TileType[][] = [];
+	private grid: TileType[][];
 	private tileSize: number;
 	private bg: NineSliceSprite;
+	public waveContainer = new Container();
 	private tilesContainer = new Container();
+	private tilesSort = [];
 
 	constructor(private widthIdx: number, private heightIdx: number, tileSize: number = 64) {
 		super();
@@ -114,18 +135,88 @@ export class TerrainSystem extends Container {
 		this.bg = this.addChild(new NineSliceSprite(await Assets.load('Tilemap_Water')));
 		this.bg.width = this.widthIdx * this.tileSize;
 		this.bg.height = this.heightIdx * this.tileSize;
+		this.addChild(this.waveContainer);
 		this.addChild(this.tilesContainer);
+		// this.tilesContainer.scale.set(0.8);
 		await this.initGrid();
 		await this.initTiles();
 	}
 
 	private async initGrid() {
+		const mapData = Array.from({ length: this.heightIdx }, () => Array.from({ length: this.widthIdx }, () => TileType.Dirt));
+
+		// 生成水域（使用洪水扩散算法）
+		this.createWaterClusters(mapData, 5); // 5个初始水点
+
+		// 生成草地（水域周围）
+		this.spreadTerrain(mapData, TileType.Water, TileType.Grass, 6);
+
+		// 生成干草（草地上随机生成）
+		this.spawnHay(mapData, 0.4); // 10%概率
+
+		this.grid = mapData;
 		for (let y = 0; y < this.heightIdx; y++) {
-			this.grid[y] = [];
 			for (let x = 0; x < this.widthIdx; x++) {
-				let type = [TileType.Grass, TileType.Straw][GameUtils.randomInt(0, 1)];
-				this.grid[y][x] = type;
-				this.tilesContainer.addChild(await this.createTile(x, y, type));
+				let tile = await this.createTile(x, y, this.grid[y][x]);
+				this.tilesSort.push(tile);
+				if (this.grid[y][x] === TileType.Water) {
+					// this.tilesContainer.addChildAt(tile, 0);
+				} else {
+					this.tilesContainer.addChild(tile);
+				}
+			}
+		}
+		return mapData;
+	}
+
+	createWaterClusters(mapData, initialPoints) {
+		for (let i = 0; i < initialPoints; i++) {
+			let x = Math.floor(Math.random() * this.widthIdx);
+			let y = Math.floor(Math.random() * this.heightIdx);
+			this.floodFill(mapData, x, y, TileType.Water, 0.7); // 70%扩散概率
+		}
+	}
+
+	floodFill(mapData, x, y, targetType, spreadProb) {
+		if (x < 0 || x >= this.widthIdx || y < 0 || y >= this.heightIdx) return;
+		if (mapData[y][x] !== TileType.Dirt) return;
+
+		mapData[y][x] = targetType;
+
+		// 四方向扩散
+		if (Math.random() < spreadProb) this.floodFill(mapData, x + 1, y, targetType, spreadProb * 0.9);
+		if (Math.random() < spreadProb) this.floodFill(mapData, x - 1, y, targetType, spreadProb * 0.9);
+		if (Math.random() < spreadProb) this.floodFill(mapData, x, y + 1, targetType, spreadProb * 0.9);
+		if (Math.random() < spreadProb) this.floodFill(mapData, x, y - 1, targetType, spreadProb * 0.9);
+	}
+
+	// 地形扩散函数
+	spreadTerrain(mapData, sourceType, targetType, radius) {
+		for (let y = 0; y < this.heightIdx; y++) {
+			for (let x = 0; x < this.widthIdx; x++) {
+				if (mapData[y][x] === sourceType) {
+					for (let dy = -radius; dy <= radius; dy++) {
+						for (let dx = -radius; dx <= radius; dx++) {
+							const nx = x + dx;
+							const ny = y + dy;
+							if (nx >= 0 && nx < this.widthIdx && ny >= 0 && ny < this.heightIdx) {
+								if (mapData[ny][nx] === TileType.Dirt && Math.random() < 0.6) {
+									mapData[ny][nx] = targetType;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	spawnHay(mapData, probability) {
+		for (let y = 0; y < this.heightIdx; y++) {
+			for (let x = 0; x < this.widthIdx; x++) {
+				if (mapData[y][x] === TileType.Dirt && Math.random() < probability) {
+					mapData[y][x] = TileType.Straw;
+				}
 			}
 		}
 	}
@@ -133,7 +224,7 @@ export class TerrainSystem extends Container {
 	private async initTiles() {
 		for (let y = 0; y < this.heightIdx; y++) {
 			for (let x = 0; x < this.widthIdx; x++) {
-				(this.tilesContainer.children[y * this.widthIdx + x] as TerrainTile).updateTexture(this.grid, x, y);
+				(this.tilesSort[y * this.widthIdx + x] as TerrainTile).updateTexture(this.grid, x, y);
 				// this.setTile(x, y, TileType.Grass);
 			}
 		}
@@ -161,7 +252,7 @@ export class TerrainSystem extends Container {
 				const nx = x + dx;
 				const ny = y + dy;
 				if (this.isValid(nx, ny)) {
-					(this.tilesContainer.children[ny * this.widthIdx + nx] as TerrainTile).updateTexture(this.grid, nx, ny);
+					(this.tilesSort[ny * this.widthIdx + nx] as TerrainTile).updateTexture(this.grid, nx, ny);
 				}
 			}
 		}

@@ -365,6 +365,11 @@
         type: "image"
       },
       {
+        alias: "Tilemap_Dirt",
+        src: "./assets/Terrain/Tilemap_Dirt.png",
+        type: "image"
+      },
+      {
         alias: "Tilemap_Elevation",
         src: "./assets/Terrain/Tilemap_Elevation.png",
         type: "image"

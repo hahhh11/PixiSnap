@@ -1,5 +1,5 @@
-import { Container, Sprite, Text, TextStyle, NineSliceSprite, TextStyleOptions } from "pixi.js";
-import { gsap } from "gsap";
+import { Container, Sprite, Text, TextStyle, NineSliceSprite, TextStyleOptions } from 'pixi.js';
+import { gsap } from 'gsap';
 
 type ButtonSprite = Sprite | NineSliceSprite;
 
@@ -46,7 +46,7 @@ export class Button extends Container {
 		this.downOffsetX = options.downOffsetX ?? 0;
 		this.downOffsetY = options.downOffsetY ?? 0;
 		this.interactive = true;
-		this.cursor = "pointer";
+		this.cursor = 'pointer';
 
 		// 初始化默认纹理
 		this.addChild(this.upSprite);
@@ -62,7 +62,7 @@ export class Button extends Container {
 			let style: TextStyleOptions = {
 				fill: 0xffffff,
 				fontSize: 24,
-				align: "center",
+				align: 'center',
 				...options.textStyle,
 			};
 			this.textElement = new Text({ text: options.text, style });
@@ -111,11 +111,7 @@ export class Button extends Container {
 
 	// 事件处理
 	private enableInteraction() {
-		this.on("pointerdown", this.onButtonDown)
-			.on("pointerup", this.onButtonUp)
-			.on("pointerupoutside", this.onButtonUp)
-			.on("pointerover", this.onButtonOver)
-			.on("pointerout", this.onButtonOut);
+		this.on('pointerdown', this.onButtonDown).on('pointerup', this.onButtonUp).on('pointerupoutside', this.onButtonUp).on('pointerover', this.onButtonOver).on('pointerout', this.onButtonOut);
 	}
 
 	private onButtonDown = () => {
@@ -133,12 +129,12 @@ export class Button extends Container {
 		}
 		if (this.textElement) this.addChild(this.textElement);
 
-		gsap.to(this.scale, {
-			x: 0.95,
-			y: 0.95,
-			duration: 0.1,
-			ease: "power2.out",
-		});
+		// gsap.to(this.scale, {
+		// 	x: 1,
+		// 	y: 1,
+		// 	duration: 0.1,
+		// 	ease: 'power2.out',
+		// });
 	};
 
 	private onButtonUp = () => {
@@ -158,7 +154,7 @@ export class Button extends Container {
 			x: 1,
 			y: 1,
 			duration: 0.2,
-			ease: "elastic.out(1.2, 0.5)",
+			ease: 'elastic.out(1.2, 0.5)',
 		});
 	};
 

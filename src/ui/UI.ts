@@ -1,4 +1,4 @@
-import { Assets, Graphics, NineSliceSprite, Sprite, Texture } from 'pixi.js';
+import { Assets, Container, Graphics, NineSliceSprite, Sprite, Texture } from 'pixi.js';
 import { ImageProgressBar, ImageProgressBarOptions } from './componets/ImageProgressBar';
 import { SpriteSheetAnimator } from '../core/animations/SpriteSheetAnimator';
 import { Character } from '../game/entities/Character';
@@ -13,6 +13,13 @@ import { Tree } from '../game/entities/Tree';
  * @FilePath: \PixiSnap\src\ui\UI.ts
  */
 export class UI {
+	static container(x = 0, y = 0) {
+		let ctn = new Container();
+		ctn.x = x;
+		ctn.y = y;
+		return ctn;
+	}
+
 	static rect(x, y, width, height, color = 0x00000, alpha = 1) {
 		let rect = new Graphics();
 		rect.rect(x, y, width, height);
